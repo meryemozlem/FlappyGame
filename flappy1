@@ -1,0 +1,212 @@
+using UnityEngine;
+ 
+public class Arkaplan : MonoBehaviour
+{
+    public GameObject gokyuzu;
+    public GameObject toprak;
+ 
+    private int arkaplanSayisi;
+ 
+    private Vector2 kameraUnityEbatlar;
+    private Vector2 gokyuzuUnityEbatlar;
+    private Vector2 toprakUnityEbatlar;
+ 
+    private Transform[] gokyuzuObjeleri;
+    private Transform[] toprakObjeleri;
+    private int bastakiArkaplanObjesi = 0;
+ 
+    void Start()
+    {
+        Camera kamera = GetComponent<Camera>();
+ 
+        gokyuzuUnityEbatlar = gokyuzu.GetComponent<SpriteRenderer>().sprite.rect.size / 100;
+        toprakUnityEbatlar = toprak.GetComponent<SpriteRenderer>().sprite.rect.size / 100;
+ 
+        kamera.orthographicSize = ( gokyuzuUnityEbatlar.y + toprakUnityEbatlar.y ) / 2;
+        arkaplanSayisi = Mathf.CeilToInt( ( kamera.orthographicSize * 2 * kamera.aspect ) / gokyuzuUnityEbatlar.x ) + 1;
+ 
+        kameraUnityEbatlar = new Vector2( kamera.orthographicSize * kamera.aspect, kamera.orthographicSize );
+ 
+        gokyuzuObjeleri = new Transform[arkaplanSayisi];
+        toprakObjeleri = new Transform[arkaplanSayisi];
+ 
+        for( int i = 0; i < arkaplanSayisi; i++ )
+        {
+            float xKoordinati = transform.position.x - kameraUnityEbatlar.x + i * gokyuzuUnityEbatlar.x;
+            gokyuzuObjeleri[i] = Instantiate( gokyuzu, new Vector3( xKoordinati, kameraUnityEbatlar.y, 0 ), Quaternion.identity ).transform;
+            toprakObjeleri[i] = Instantiate( toprak, new Vector3( xKoordinati, kameraUnityEbatlar.y - gokyuzuUnityEbatlar.y, 0 ), Quaternion.identity ).transform;
+        }
+    }
+ 
+    void Update()
+    {
+        if( transform.position.x - kameraUnityEbatlar.x >= gokyuzuObjeleri[bastakiArkaplanObjesi].position.x + gokyuzuUnityEbatlar.x )
+        {
+            gokyuzuObjeleri[bastakiArkaplanObjesi].Translate( arkaplanSayisi * gokyuzuUnityEbatlar.x, 0, 0 );
+            toprakObjeleri[bastakiArkaplanObjesi].Translate( arkaplanSayisi * gokyuzuUnityEbatlar.x, 0, 0 );
+            bastakiArkaplanObjesi++;
+ 
+            if( bastakiArkaplanObjesi == gokyuzuObjeleri.Length )
+                bastakiArkaplanObjesi = 0;
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+using UnityEngine;
+ 
+public class Arkaplan : MonoBehaviour
+{
+    public GameObject gokyuzu;
+    public GameObject toprak;
+ 
+    public float gokyuzuSagaKaymaHizi = 1.0f;
+ 
+    private int arkaplanSayisi;
+ 
+    private Vector2 kameraUnityEbatlar;
+    private Vector2 gokyuzuUnityEbatlar;
+    private Vector2 toprakUnityEbatlar;
+ 
+    private Transform[] gokyuzuObjeleri;
+    private Transform[] toprakObjeleri;
+    private int bastakiGokyuzuArkaplanObjesi = 0;
+    private int bastakiToprakArkaplanObjesi = 0;
+ 
+    private Transform gokyuzuParent;
+ 
+    void Start()
+    {
+        Camera kamera = GetComponent<Camera>();
+ 
+        gokyuzuUnityEbatlar = gokyuzu.GetComponent<SpriteRenderer>().sprite.rect.size / 100;
+        toprakUnityEbatlar = toprak.GetComponent<SpriteRenderer>().sprite.rect.size / 100;
+ 
+        kamera.orthographicSize = ( gokyuzuUnityEbatlar.y + toprakUnityEbatlar.y ) / 2;
+        arkaplanSayisi = Mathf.CeilToInt( ( kamera.orthographicSize * 2 * kamera.aspect ) / gokyuzuUnityEbatlar.x ) + 1;
+ 
+        kameraUnityEbatlar = new Vector2( kamera.orthographicSize * kamera.aspect, kamera.orthographicSize );
+ 
+        gokyuzuObjeleri = new Transform[arkaplanSayisi];
+        toprakObjeleri = new Transform[arkaplanSayisi];
+ 
+        gokyuzuParent = new GameObject().transform;
+ 
+        for( int i = 0; i < arkaplanSayisi; i++ )
+        {
+            float xKoordinati = transform.position.x - kameraUnityEbatlar.x + i * gokyuzuUnityEbatlar.x;
+            gokyuzuObjeleri[i] = Instantiate( gokyuzu, new Vector3( xKoordinati, kameraUnityEbatlar.y, 0 ), Quaternion.identity ).transform;
+            gokyuzuObjeleri[i].SetParent( gokyuzuParent );
+            toprakObjeleri[i] = Instantiate( toprak, new Vector3( xKoordinati, kameraUnityEbatlar.y - gokyuzuUnityEbatlar.y, 0 ), Quaternion.identity ).transform;
+        }
+    }
+ 
+    void Update()
+    {
+        if( transform.position.x - kameraUnityEbatlar.x >= gokyuzuObjeleri[bastakiGokyuzuArkaplanObjesi].position.x + gokyuzuUnityEbatlar.x )
+        {
+            gokyuzuObjeleri[bastakiGokyuzuArkaplanObjesi].Translate( arkaplanSayisi * gokyuzuUnityEbatlar.x, 0, 0 );
+            bastakiGokyuzuArkaplanObjesi++;
+ 
+            if( bastakiGokyuzuArkaplanObjesi == gokyuzuObjeleri.Length )
+                bastakiGokyuzuArkaplanObjesi = 0;
+        }
+ 
+        if( transform.position.x - kameraUnityEbatlar.x >= toprakObjeleri[bastakiToprakArkaplanObjesi].position.x + toprakUnityEbatlar.x )
+        {
+            toprakObjeleri[bastakiToprakArkaplanObjesi].Translate( arkaplanSayisi * gokyuzuUnityEbatlar.x, 0, 0 );
+            bastakiToprakArkaplanObjesi++;
+ 
+            if( bastakiToprakArkaplanObjesi == gokyuzuObjeleri.Length )
+                bastakiToprakArkaplanObjesi = 0;
+        }
+ 
+        gokyuzuParent.Translate( gokyuzuSagaKaymaHizi * Time.deltaTime, 0, 0 );
+    }
+}
+
+
+
+
+
+using UnityEngine;
+ 
+public class Engeller : MonoBehaviour
+{
+    public GameObject ustEngel;
+    public GameObject altEngel;
+ 
+    public float altUstEngelArasiBosluk = 0.8f;
+    public float ikiEngelArasiMesafe = 2f;
+ 
+    private int engelSayisi;
+ 
+    private Vector2 kameraUnityEbatlar;
+    private Vector2 engelUnityEbatlar;
+ 
+    private Transform[] ustEngelObjeleri;
+    private Transform[] altEngelObjeleri;
+    private int bastakiEngelObjesi = 0;
+ 
+    void Start()
+    {
+        Camera kamera = GetComponent<Camera>();
+ 
+        engelUnityEbatlar = ustEngel.GetComponent<SpriteRenderer>().sprite.rect.size / 100;
+        kameraUnityEbatlar = new Vector2( kamera.orthographicSize * kamera.aspect, kamera.orthographicSize );
+ 
+        engelSayisi = Mathf.CeilToInt( ( kamera.orthographicSize * 2 * kamera.aspect ) / ( engelUnityEbatlar.x + ikiEngelArasiMesafe ) ) + 1;
+ 
+        ustEngelObjeleri = new Transform[engelSayisi];
+        altEngelObjeleri = new Transform[engelSayisi];
+ 
+        for( int i = 0; i < engelSayisi; i++ )
+        {
+            float xKoordinati = transform.position.x + kameraUnityEbatlar.x + i * ( engelUnityEbatlar.x + ikiEngelArasiMesafe );
+            float yKoordinati = Random.Range( -kameraUnityEbatlar.y + altUstEngelArasiBosluk + 0.6f, kameraUnityEbatlar.y - 0.6f );
+            ustEngelObjeleri[i] = Instantiate( ustEngel, new Vector3( xKoordinati, yKoordinati, 0 ), Quaternion.identity ).transform;
+            altEngelObjeleri[i] = Instantiate( altEngel, new Vector3( xKoordinati, yKoordinati - altUstEngelArasiBosluk, 0 ), Quaternion.identity ).transform;
+        }
+    }
+ 
+    void Update()
+    {
+        if( transform.position.x - kameraUnityEbatlar.x >= ustEngelObjeleri[bastakiEngelObjesi].position.x + engelUnityEbatlar.x )
+        {
+            float yKoordinati = Random.Range( -kameraUnityEbatlar.y + altUstEngelArasiBosluk + 0.6f, kameraUnityEbatlar.y - 0.6f );
+ 
+            Vector3 ustEngelPosition = ustEngelObjeleri[bastakiEngelObjesi].position;
+            Vector3 altEngelPosition = altEngelObjeleri[bastakiEngelObjesi].position;
+ 
+            ustEngelPosition.x += engelSayisi * ( engelUnityEbatlar.x + ikiEngelArasiMesafe );
+            altEngelPosition.x += engelSayisi * ( engelUnityEbatlar.x + ikiEngelArasiMesafe );
+ 
+            ustEngelPosition.y = yKoordinati;
+            altEngelPosition.y = yKoordinati - altUstEngelArasiBosluk;
+ 
+            ustEngelObjeleri[bastakiEngelObjesi].position = ustEngelPosition;
+            altEngelObjeleri[bastakiEngelObjesi].position = altEngelPosition;
+ 
+            bastakiEngelObjesi++;
+ 
+            if( bastakiEngelObjesi == ustEngelObjeleri.Length )
+                bastakiEngelObjesi = 0;
+        }
+    }
+}
